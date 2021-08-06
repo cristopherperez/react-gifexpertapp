@@ -1,0 +1,206 @@
+----68 Inicio de proyecto
+Se usan los api de
+ https://developers.giphy.com/
+Iniciar el proyecto 
+ npx create-react-app gif-expert-app
+
+----69 gifExpertApp-component
+1 Borramos importaciones y app, reactstricmode, porq hace mas quisquilloso react, logo, etc, dejamos indexcss, js setuptest
+2 Crear un componente en la carpeta src, escribir rafc + tab, lo importamos en el indexjs
+
+----70 Creando una lista de categorias
+1 crear una const con una lista en el componente fuera del return
+====Como hacemos para mostrar la lista dentro del html??
+2 Podemos usar metodos q tienen los arreglos como .map Dentro de una ol abrimos llaves {} y llamamos categories.map(=>), y el map nos va a 
+servir para transformar cada uno de los elementos q estan dentro del arreglo. Luego dentro del return ponemos un li q debe tener una llave
+unica key{} q tiene q ser unica.
+El map recibe 2 argumentos por defecto, la categoria y el indice, pero indice no lo vamos a usar. Vamos a poner q el valor de key es 
+category y q lista muestra category
+===Agregar un elemento al array con un button
+1 Cambiamos la lista por un hook useState. Lo importamos. Como valor inical ponemos un array. 
+2 Creamos una funcion de flecha para q agregue un nvo elemento al arreglo
+3 Demos usar el setCategories porq es lo q se usa para cambiar las ppiedades, de esa manera react va a saber q cambio, podemos usar el
+opretaor string [...categories, 'Algo'] De esta manera mantengo las categorias anteriores y agrego una nva
+4 Crea un boton y llamo a la funcion con un onclick y {}
+
+----71 Componente AddCategory
+1 Crear un componente q tenga una cadena de texto, presione enter y la agregue a la lista de categoria. Lo creamos dentro de una carpeta
+components
+2 escribimos dentro del compnente rafc 
+3 cambiamos el div por un fragment
+4 Importamos el componente en el componente padre y lo ponemos donde querramos
+5 En el componente nvo ponemos un input asi podemos escribir, con el type=text
+6 Esa caja de texto necesita un estado para saber lo q estan escribiendo, para eso se usa useState.
+7 Ponemos el valor del input
+8 Para cambiar el valor se pone onChange en el input con una funcion de flecha
+9 necesito extraer el valor creando una variable con una funcion de flecha y el value dentro de setInputValue
+10 Para manejar el enter crear un form q contenga el input, q tenga un onSubmit y la funcion q querramos
+11 Para prevenir el comportamiento por defecto del form 
+ e.preventDefault()
+
+----72 Comunicacion entre componentes
+===Como hacemos la comunicacion entre componentes?
+Si vemos tenemos un componente q es el encargado de escribir y otro del renderizado de la informacion. La forma seria llamar a la funcion 
+q tiene setCategories q agrega elementos a la lista al componente addCategory. Podemos pasarle ppiedades a AddCategory
+1 Vamos a mandar una fucion a ese componente desde donde esta siendo llamado con la referencia setCategories
+====Como recibimos las ppiedas en un componente?
+1 Llamar a setCategories en el componente hijo. Se desestructuran los argumentos del componente. Lo q enviamos en el componente padre lo 
+ponemos en el export del hijo.
+2 llamar la funcion con un callback q tenga el estado anterior, y poner el nvo input value
+===Hacer una validacion
+Usamos un if con el trim para borrar los espacios en blanco, un length y borrar el valor asi evitamos un doble posteo
+===Hacer q una funcion sea requerida, en este caso setCategories sobre el componente AddCategory
+1 importar PropTypes
+ import PropTypes from 'prop-types';
+2 Al final copiamos el nombre del componente, le sumamos propTypes, decimos q es igual a un objeto. Adentro el nombre q le pusimos a la
+ppiedad, decimos q es igual al paquete q importamos, funcion, es requerida. Todo funciona bien porq se mada como argumento la misma funcion
+q se esta pidiendo, pero si alguien quiere usar AddCategory va a marcar un error q es requerido
+AddCategory.propTypes = {
+  setCategories: PropTypes.func.isRequired
+}
+Es bueno para ponerle un candado a la aplicacion con los arguementos q necesitamos
+
+----73 Fetch Api, obtener las imagenes deseadas
+===Se desea crear un elemento q cuando vea un nvo elemento haga la peticion http y traiga las imagenes correspondientes a la categoria y
+se despliegan en la lista
+1 Es necesario crear un componente q reciba el elemento de la lista como argumento y dentro del cual se va a disparar la peticion del http
+y q el elemento se renderice en lugar del <li> de GifExpertApp un argumento
+2 Adentro del componente creado, rafc + tab
+3 Le ponemos como argumento la category q va a recibir
+4 Reemplazamos <li> con el componente nvo, lo importamos y mandamos la category q debe ser igual a la q estamos evaluando. A eso le sumo
+una key
+===En GifGrid necesito recibir la categoria y hacer una peticion http
+1 Creamos una funcion, luego lo optimizamos y hacemos la peticion http q traigan esa categoria. En la pagina giphy esta en la parte de 
+search point. Para ello copiamos el url q figura
+2 En postman (la aplicacion), vamos a GET, le mandamos como argumento el apikey.
+	1 Al final de lo q se genero agregamos un ?
+	2 En la parte q dice key para escribir api_key
+	3 En el value nuestra apikey A4bGEyYaZ69SvpQu6NifEgE5hYWapt9T Tocamos send y ya tenemos la data
+	4 Para buscar algo ponemos en key q y como value Rick y Morty, send y vemos la respuesta 
+	5 Le agramos un limit y value de 10
+	6 Arrastamos el api_key al final
+	7 Copiamos el get y nos vamos a vsc
+3 Creamos una const con la direccion del get, le agramos + donde haya espacions, un https:// al comienzo 
+4 Convertimos la funcion en una async y await
+5 Hacemos una const data q sea igual al await de la resp.json, porq es informacion en formato json
+6 Llamar la funcion en el mismo cuerpo  pero antes del return
+7 Como interesa informacion especifica puedo usar desestructuracion
+9 Podemos usar el ? para preguntar si vienen las imagenes entonces q lo utilice 
+
+----74 useEffect
+Tips para entender el useEffect
+useEffect permite ejecutar codigo de maner condicional
+1 crear el estado 
+ useState + tab ,
+2 Llamar al setCount (fue el nombre q le pusimos), en cualquier lado
+3 Creamos un button y llamamos ahi dentro de la funcino
+4 Al hacer click, va a llamar al compnente y se va a disparar cada vez q haya un cambio en el componente. Quiere decir q detecto algo y 
+esta volviendo a usar todo el codigo del componente porq hay q actualizaar las referencias. Para evitar el ciclo infinito de las cosas se
+debe usar useEffect
+5 Importar useEffect. 
+===Como funciona?
+ useEffect, tiene una funcion q quiero ejecutar, en este caso getGifs
+Si lo uso sin el segundo argumento va a seguir llamando las peticiones http repetidas
+El segundo argumento debe ser una lista de dependencias (es un array vacio)
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    getGifs();
+  }, [])
+
+----75 Mostrar los titulos de las imagenes
+Momento de trabajar con la respuesta de la API
+1 Creamos un useState nvo con un valor de []
+2 Llamos el state y el nvo estado serian los gifs
+3 mostramos el title y le damos un id a las key
+      <ol>
+        {
+          images.map(({ id, title }) => (
+            <li key={id}>{title}</li>
+          ))
+        }
+      </ol>
+ Al repetirse el img, desestrutarizamos el id y title
+====Como la app tiene mas cuerpo, va a tener mas elementos, vamos a crear un nvo componente
+Crear el componente, hacer una desestructuracion con lo q se necesita, e importarlo en el componente.
+{...img} De esta manera se mandan cada uno de las ppiedades de la img como una ppiedad independiente
+
+----76 Clases con css
+Aplicando css comun, por eso no se borrarons los <div>, para poder darles una class.
+Overflow:hidden es para q los bordes de las imagenes no se salgan del contenedor
+Para ponerle la class se usa className, es un nombre reserado
+<div className="card"
+
+----77 Helpers - getGifs
+Usando la funcion getGifs con la interpoblacion `${}`. La categoria puede tener espacios y otras cosas, asi q es mejor evitarlos para
+tener una peticion correcta, por eso js tiene algo q se llama encodeURI q recibe como arguemtno la categoria. Se reemplaza la parta del
+nombre rick and morty con esa interpoblacion
+`balaaxza${encodeURI(category)}sadfsadf`
+Ahora habria img de one punch porq estamos mandando one punch al api
+====Hacer q lo ultimo q se ingrese en el input sea lo primero q veamos
+1 En la parte de la insercion AddCategory
+ setCategories(cats => [...cats, inputValue]); Decimos q lo q ingresamos vaya al final, hay q cambiar el orden para q sea al reves
+ setCategories(cats => [inputValue, ...cats]); Decimos q lo q ingreamos vaya al comienzo
+====Creamos una carpeta helpers
+Helpers van ser funciones q hacen un trabajo especifico, pueden recibir argumentos, los procesan y hacen algun return, q no hacen falta q
+redibujen el state 
+1 Creamos el archivo getGifs.js. Pegamos la funcion de GiftGrid y le agreamos category como argumento porq la usamos en la funcion. Como
+esta funcion es async, no es q regresa los gifs, devuelve una promesa q resuelve la coleccion de las imagenes
+2 Le agregamos export porq la tenemos q importar en GifGird
+3 Importamos la funcion y le ponemos la category como argumento. Esto resuelve una promesa, por eso hay q ponerle .then con las imgs mas
+la funcion de flecha para q devuelva setImages con las imgs. Recordar q tenemos una funcion q su argumento es mandando como primer
+argumento a la funcion q esta adentro, por eso se pueden borrar los imgs
+4 En gifGrid Para q si la categoria cambia vuelva a ejecutar la funcion, hay q opner category dentro del array
+
+----78 custom hooks
+Es una forma de extraer logica de un componente o logica q qiero re utilizar, y extraerla de tal manera q sea sencillo de utilizarlo de
+nvo.
+====Q podemos hacer con custom hook con lo q tenemos hasta aca?
+En GifGrid, useEffect vemos q hace q cuando se carga el componente por primera vez lance la peticion para obtener los gifs y los coloca en
+las imagenes. 
+ Vamos a crear un custom hook q permita cuando cargue el componente realizar la peticoin fetch y a su vez indicar cuando esta cargando y
+cuando termino la carga
+1 Comentar y elimiar cosas en GifGrid
+2 Crear una carpeta en src con un archivo useFetchGifs.js El nombre use significa q es un hook, no es obligatorio pero es un std para los
+desarrolladores. Todos los hooks comienzan con use, useState, useReduced, useContext y nuestro nvo useFetchGifs.js. Los hooks son
+funciones
+3 Lo exportamos.
+====Q diferencia hay con el funcional component?
+Los hooks pueden tener sus estados e indicar a otros componentes cuando pueden renderizarse porq algo cambio.
+4 El estado inicial va a ser un obj q va a tener un arreglo q va a ser vacio, luego tenemos un loading en true. Cuando se utilice por 1ra 
+vez el useFetchGifs tenemos el estado q va a estar cargando por defecto.
+5 Retornamos el state, q es la informacion q se encuentra en el useState
+6 Volvemos a gifGrif, para usar el customhook. Lo importamos y agregamos parentesis. Lo guardamos en una const
+7 Hacemos un clg del state q es el producto del customhook
+8 Desestructorizamos el state con el loading
+9 Para usar el loading, lo llamo en return, y le agrego un operador ternario. Va a aparecer porq no se pone en falso en ningun lado
+====Q pasaria si pone en false?
+10 Creo un setTimeout para cambiarlo
+ Los Custom hook funcionan como funcional components, pueden tener efectos, usar reducer, contextos. Se extrajo un logica q se puede 
+implementar para hacer una carga automatica. Cuando se ejecuta el componente llama useFetchGifs y cuando tengamos data la renderizamos en
+pantalla, nos desacemos de mucho codigo q no es necesario porq ahora tnemos el useFetchGifs, q se encarga de realizar esa peticion cuando
+se carga el componente la primera vez o cuando cambie la category
+ 
+----79 usarFetchGifs obtener imagenes y banderas de carga
+===Porq se implemento el useEffect?
+ Porq cada vez q cambiemos el estado en el componente gifGrid, cada vez q se hacia un cambio se renderizaba y se volvia a ejecutar. Eso 
+mismo va a suceder con el useFetchGifs, cada vez q el compontne cambie va a volver a disparlo, por consecuencia va a volver a leer todo el 
+codigo y volveria a disparar el setTimeout. 
+Entonces copiamos el useEffect y lo impimentamos tmb en el customhook. Perfectamente  se le pueden poner efectos a los custombs hooks.
+1 Lo importamos en el personal hook (useFtechGifs) y le damos un array vacio para q se ejecute una vez.
+Adentro vamos a ejectuar el cuerpo de la peticion http, aqui es donde cambie y necesito hacer la peticion a las imagenes 
+===Como hacemos la peticion a las imagenes?
+1 Llamamos al helper, importandolo,
+2 Tenemos q mandar la categoria como argumento pero como no la tenemos, por conescuencia podemos mandarle en GifGrid al useFetchGifs de ahi
+categoria como argumento. Esa categoria va a caer como una prop
+3 Al tener ya la categorypodemos evaluar el efecto unicamente cuando la categoria cambia
+Los efects no pueden ser async porq son algo sincrono
+4 getGifs es una promesa por eso tengo q usar los .then y llamar dentro el setState. Tenemos q mandarle la informacion como la estamos 
+manejando en el state y manejar siempre el mismo orden. Cambiar a false porq ya habria terminado de cargar
+===Para renombrar el data en la desestructuracion, se ponen : y el nombre
+ data:images
+
+---80 animacion con css
+Entramos a esa pagina
+ https://animate.style/
+1 importamos en el index.html
+2 en un componente en la className pegamos una animacion (en GifGridItem
